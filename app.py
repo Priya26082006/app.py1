@@ -88,3 +88,24 @@ user_details=f"""user details:given beow :resume info {USER_INFO} DEFAULT IF NOT
 query = final_prompt+user_details
 
 import base64
+if st.button('generate resume'):
+  with st.spinner("runnign agent"):
+
+    response = agent.invoke({'messages': [{'role':'user','content':query}]})
+    print(response['messages'][-1].content)
+    code=response['messages'][-1].content[-1]['text']
+
+    # swap in the actual uploaded photo instead of the placeholder tag
+    if FILE is not None:
+        with open(save_path, "rb") as img_file:
+            b64_image = base64.b64encode(img_file.read()).decode()
+        data_uri = f"data:image/jpeg;base64,{b64_image}"
+        code = code.replace("PROFILE_IMAGE_PLACEHOLDER", data_uri)
+   
+    st.html(code , width="stretch" , unsafe_allow_javascript=True)
+
+    st.divider()
+    response = agent.invoke({'messages':[{'role':'user','content':job_prompt}]})
+
+    job_code = response['messages'][-1].content[-1]['text']
+    st.html(job_code , width="stretch" , unsafe_allow_javascript = True)
