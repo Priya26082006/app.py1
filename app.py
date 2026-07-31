@@ -73,6 +73,31 @@ def resume():
 resume()
 
 #=======================IMAGE UPLOADER==============================
+FILE = st.sidebar.file_uploader(
+    "Choose an image file",
+    type=["jpg", "jpeg", "png", "webp"]
+)
+
+if FILE is not None:
+    try:
+        image = Image.open(FILE)
+
+        st.sidebar.image(image, caption="Uploaded Image", use_container_width=True)
+
+        if image.mode in ("RGBA", "P"):
+            image = image.convert("RGB")
+
+        base_name = os.path.splitext(FILE.name)[0]
+        save_path = f"{base_name}.jpg"
+
+        # 3. Save the image to the current working directory
+        image.save(save_path, "JPEG")
+
+        st.sidebar.success(f"🎉 Image successfully saved as `{save_path}`!")
+
+    except Exception as e:
+        st.error(f"Error processing image: {e}")
+
 # ==================== UPLOAD IMAGE ====================
 
 
@@ -88,6 +113,20 @@ user_details=f"""user details:given beow :resume info {USER_INFO} DEFAULT IF NOT
 query = final_prompt+user_details
 
 import base64
+
+OPTIONS = ["DELHI","NOIDA","GURUGRAM","KANPUR","LUCKNOW","BANGLORE","PUNE"]
+LOCATION = st.sidebar.multiselect("SELECT LOCATION: ",options = OPTIONS)
+
+JOB_PROFILE = ["PYTHON DEVELOPER","GEN AI","FULL-STACK DEVELOPER","DATA ANALYST"]
+
+PROFILE = st.sidebar.multiselect("SELECT JOB ROLE",options = JOB_PROFILE)
+
+job_prompt = f"""Based on {PROFILE} jobs in {LOCATION},
+I want latest job news in using tavily,
+try top 10 search or whatever available
+and give result like naukri theme design with
+job name, job desc, salary,
+apply link and OUTPUT must be in HTML no markdowns"""
 if st.button('generate resume'):
   with st.spinner("runnign agent"):
 
